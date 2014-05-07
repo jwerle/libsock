@@ -1,0 +1,5 @@
+libsock.a
+libsock.so
+libsock.so.0
+libsock.so.0.0.1
+*.o
