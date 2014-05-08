@@ -24,7 +24,6 @@ main (void) {
   {
     int rc = 0;
     int bl = 20; // backlog
-    int *blptr = &bl;
 
     {
       int port = 6001;
@@ -32,7 +31,7 @@ main (void) {
       socket_t *sock = sock_tcp_new();
       assert(sock);
 
-      rc = sock_set_opt(sock, SOCK_OPT_BACKLOG, blptr);
+      rc = sock_set_opt(sock, SOCK_OPT_BACKLOG, (const void *) &bl);
       assert(rc >= 0);
 
       rc = sock_set_opt(sock, SOCK_OPT_PORT, (const void *) &port);
@@ -49,6 +48,8 @@ main (void) {
 
       rc = sock_tcp_listen(sock);
       assert(rc >= 0);
+
+      sock_free(sock);
 
       ok("sock_tcp_listen(socket_t *) [INADDR_ANY]");
     }
@@ -62,7 +63,7 @@ main (void) {
       socket_t *sock = sock_tcp_new();
       assert(sock);
 
-      rc = sock_set_opt(sock, SOCK_OPT_BACKLOG, blptr);
+      rc = sock_set_opt(sock, SOCK_OPT_BACKLOG, (const void *) &bl);
       assert(rc >= 0);
 
       rc = sock_set_opt(sock, SOCK_OPT_PORT, (const void *) &port);
@@ -80,8 +81,6 @@ main (void) {
       rc = sock_tcp_listen(sock);
       assert(rc >= 0);
 
-      buf = (char *) malloc(sizeof(char) * BUF_SIZE);
-
       while ((rc = sock_accept(sock))) {
         if (reads == limit) { break; }
         buf = sock_read(sock);
@@ -93,9 +92,7 @@ main (void) {
         free(buf);
         sock_close(sock);
         usleep(5000);
-        reads++;
-        printf("%c[2K", 27);
-        printf("\r  ...reads: (+%d/%d)", reads, limit);
+        printf("%c[2K\r  ...reads: (+%d/%d)", 27,++ reads, limit);
         fflush(stdout);
       }
 

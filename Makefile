@@ -71,13 +71,11 @@ $(TESTS):
 	@./$(@:.c=)
 
 tests/tcp.c:
-	@{ \
-		./tests/tcp-client.sh & \
-		pid=$$!; \
-		echo $$pid; \
+	@{ 																															  \
+		./tests/tcp-client.sh & > /dev/null 2>&1 pid=$$!;               \
 		cc $(@) deps/ok/libok.a $(TARGET_STATIC) $(CFLAGS) -o $(@:.c=); \
-		./$(@:.c=); \
-		kill -9 $$pid; \
+		./$(@:.c=);  																									  \
+		kill -9 $$pid;  																								\
 	}
 
 deps:
