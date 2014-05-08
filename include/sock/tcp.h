@@ -14,7 +14,6 @@
 typedef struct socket_tcp_s {
   SOCK_SOCKET_FIELDS
   int backlog;
-  struct hostent *host;
 } socket_tcp_t;
 
 /**

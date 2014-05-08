@@ -8,7 +8,8 @@
 #ifndef SOCK_H
 #define SOCK_H 1
 
-#include "sock/stream.h"
+#include "sock/socket.h"
+#include "sock/tcp.h"
 #include "sock/dgram.h"
 
 #endif

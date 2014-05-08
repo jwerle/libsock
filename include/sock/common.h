@@ -1,3 +1,4 @@
+
 /**
  * `common.h' - libsock
  *
@@ -7,7 +8,6 @@
 #ifndef SOCK_COMMON_H
 #define SOCK_COMMON_H 1
 
-#include <netinet/ip.h>
 
 #if __GNUC__ >= 4
 # define SOCK_EXTERN __attribute__((visibility("default")))

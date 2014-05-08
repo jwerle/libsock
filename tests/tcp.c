@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <netinet/ip.h>
 #include <ok/ok.h>
 #include <assert.h>
 #include <sock/opt.h>
@@ -15,22 +16,20 @@ main (void) {
   {
     socket_t *sock = sock_tcp_new();
     assert(sock);
+    sock_free(sock);
 
     ok("sock_tcp_new()");
   }
 
   {
     int rc = 0;
-    int port = 0;
     int bl = 20; // backlog
     int *blptr = &bl;
-    const char *host = NULL;
-    socket_t *sock = NULL;
 
     {
-      port = 6001;
-      host = "0.0.0.0";
-      sock = sock_tcp_new();
+      int port = 6001;
+      char *host = "127.0.0.1";
+      socket_t *sock = sock_tcp_new();
       assert(sock);
 
       rc = sock_set_opt(sock, SOCK_OPT_BACKLOG, blptr);
@@ -42,19 +41,25 @@ main (void) {
       rc = sock_set_opt(sock, SOCK_OPT_ADDR, (const void *) INADDR_ANY);
       assert(rc >= 0);
 
-      //rc = sock_tcp_listen(sock);
-      //assert(rc >= 0);
+      rc = sock_set_opt(sock, SOCK_OPT_HOST, (const void *) host);
+      assert(rc >= 0);
 
-      //rc = sock_tcp_close(sock);
-      //assert(rc >= 0);
+      rc = sock_bind(sock);
+      assert(rc >= 0);
+
+      rc = sock_tcp_listen(sock);
+      assert(rc >= 0);
 
       ok("sock_tcp_listen(socket_t *) [INADDR_ANY]");
     }
 
     {
-      port = 8888;
-      host = "127.0.0.1";
-      sock = sock_tcp_new();
+      int reads = 0;
+      int limit = 10;
+      int port = 8888;
+      char *host = "127.0.0.1";
+      char *buf = NULL;
+      socket_t *sock = sock_tcp_new();
       assert(sock);
 
       rc = sock_set_opt(sock, SOCK_OPT_BACKLOG, blptr);
@@ -75,14 +80,28 @@ main (void) {
       rc = sock_tcp_listen(sock);
       assert(rc >= 0);
 
+      buf = (char *) malloc(sizeof(char) * BUF_SIZE);
+
       while ((rc = sock_accept(sock))) {
-        char *buf = (char *) malloc(sizeof(char) * BUF_SIZE);
-        while (sock_read(sock, buf, BUF_SIZE) > 0) {
-          close(sock->sfd);
+        if (reads == limit) { break; }
+        buf = sock_read(sock);
+        if (NULL == buf) {
+          sock_close(sock);
           free(buf);
+          return perror("sock_read()"), 1;
         }
-        usleep(500000);
+        free(buf);
+        sock_close(sock);
+        usleep(5000);
+        reads++;
+        printf("%c[2K", 27);
+        printf("\r  ...reads: (+%d/%d)", reads, limit);
+        fflush(stdout);
       }
+
+      printf("\n");
+
+      sock_free(sock);
 
       ok("sock_tcp_listen(socket_t *) [127.0.0.1]");
     }

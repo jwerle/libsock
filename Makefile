@@ -70,6 +70,16 @@ $(TESTS):
 	@cc $(@) deps/ok/libok.a $(TARGET_STATIC) $(CFLAGS) -o $(@:.c=)
 	@./$(@:.c=)
 
+tests/tcp.c:
+	@{ \
+		./tests/tcp-client.sh & \
+		pid=$$!; \
+		echo $$pid; \
+		cc $(@) deps/ok/libok.a $(TARGET_STATIC) $(CFLAGS) -o $(@:.c=); \
+		./$(@:.c=); \
+		kill -9 $$pid; \
+	}
+
 deps:
 	make -C deps/ok
 

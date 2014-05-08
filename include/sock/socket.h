@@ -11,6 +11,8 @@
 #include <sys/socket.h>
 #include "common.h"
 
+#define SOCK_BUFSIZE 4096
+
 #define SOCK_SOCKET_FIELDS   \
   int type;                  \
   int fd;                    \
@@ -21,6 +23,37 @@
 typedef struct socket_s {
   SOCK_SOCKET_FIELDS
 } socket_t;
+
+/**
+ * Allocates a new `socket_t *' type
+ * with an internal call to `socket(int, int, int)'
+ * defaulting to `0' as the protocol family.
+ * To create a socket with a set protocol family
+ * use `sock_raw_new (int, int, int)' or
+ * `socket(int, int, int)' and pass its
+ * return value to `sock_init(int)' to get a
+ * newly allocated `socket_t *'.
+ */
+
+SOCK_EXTERN socket_t *
+sock_new (int, int);
+
+/**
+ * Calls `socket(int, int, int)' internally
+ * and returns file descriptor.
+ */
+
+SOCK_EXTERN int
+sock_raw_new (int, int, int);
+
+/**
+ * Allocates a new `socket_t *' from
+ * a given file descriptor created with
+ * `socket(int, int, int)'
+ */
+
+SOCK_EXTERN socket_t *
+sock_init (socket_t *, int);
 
 /**
  * Accepts a connection on `socket_t *'
@@ -34,8 +67,8 @@ sock_accept (socket_t *);
  * buffer
  */
 
-SOCK_EXTERN ssize_t
-sock_read (socket_t *, char *, size_t);
+SOCK_EXTERN char *
+sock_read (socket_t *);
 
 /**
  * Binds socket
@@ -43,5 +76,19 @@ sock_read (socket_t *, char *, size_t);
 
 SOCK_EXTERN int
 sock_bind(socket_t *);
+
+/**
+ * Closes a socket
+ */
+
+SOCK_EXTERN int
+sock_close (socket_t *);
+
+/**
+ * Free a socket from memory
+ */
+
+SOCK_EXTERN void
+sock_free (socket_t *);
 
 #endif
