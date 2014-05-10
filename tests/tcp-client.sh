@@ -1,5 +1,6 @@
 #!/bin/bash
 
-for (( i = 0; i < 15; ++i )); do
-  echo "$i" | nc localhost 8888
+sleep 1
+for (( i = 0; i < 10; ++i )); do
+  printf "%s\n" "$i" | netcat localhost 6002
 done

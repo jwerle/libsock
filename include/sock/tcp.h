@@ -38,4 +38,12 @@ sock_tcp_listen (socket_t *);
 SOCK_EXTERN int
 sock_tcp_close (socket_t *);
 
+/**
+ * Creates a new tcp socket client
+ * for a given host and port
+ */
+
+SOCK_EXTERN socket_t *
+sock_tcp_client_new (const char *, int);
+
 #endif

@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 #include <sys/socket.h>
 #include <netinet/ip.h>
 #include "sock/socket.h"
@@ -45,11 +46,11 @@ sock_init (socket_t *self, int fd) {
   if (NULL == self) { return NULL; }
   if (NULL == addr) { return NULL; }
 
-  // address
-  addr->sin_family = AF_INET;
-  addr->sin_addr.s_addr = INADDR_ANY;
+  // empty
+  bzero((char *) addr, sizeof(struct sockaddr_in));
 
   // assign
+  self->host = NULL;
   self->addr = addr;
   self->fd = fd;
   return self;
@@ -65,16 +66,24 @@ sock_accept (socket_t *self) {
 }
 
 char *
-sock_read (socket_t *self) {
+sock_recv (socket_t *self) {
   ssize_t size = 0;
   char *buf = (char *) malloc(sizeof(buf));
   if (NULL == buf) { return NULL; }
-sread:
+read:
   size = recv(self->sfd, buf, SOCK_BUFSIZE, 0);
   buf[size] = '\0';
-  if (size < 0) { return free(buf), NULL; }
-  else if (0 == size) { goto sread; }
+  if (size < 0) return perror("sock_recv()"), free(buf), NULL;
+  else if (0 == size) goto read;
   return buf;
+}
+
+int
+sock_read (socket_t *self, char *buf, size_t size) {
+  bzero(buf, size);
+  int rc = read(self->fd, buf, size - 1);
+  if (rc < 0) { return perror("sock_read"), -1; }
+  return rc;
 }
 
 int
@@ -82,6 +91,20 @@ sock_bind (socket_t *self) {
   size_t len = sizeof(struct sockaddr_in);
   int rc = bind(self->fd, (struct sockaddr *) self->addr, len);
   if (rc < 0) { return perror("sock_bind"), rc; }
+  return rc;
+}
+
+int
+sock_connect (socket_t *self) {
+  int rc = connect(self->fd,
+      (struct sockaddr *) self->addr, sizeof(struct sockaddr_in));
+  if (rc < 0) { return perror("sock_connect"), rc; }
+  return rc;
+}
+
+int
+sock_write (socket_t *self, char *buf) {
+  int rc = write(self->fd, buf, strlen(buf) + 1);
   return rc;
 }
 

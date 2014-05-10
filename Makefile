@@ -71,12 +71,12 @@ $(TESTS):
 	@./$(@:.c=)
 
 tests/tcp.c:
-	@{ 																															  \
-		./tests/tcp-client.sh & > /dev/null 2>&1 pid=$$!;               \
-		cc $(@) deps/ok/libok.a $(TARGET_STATIC) $(CFLAGS) -o $(@:.c=); \
-		./$(@:.c=);  																									  \
-		kill -9 $$pid;  																								\
-	}
+	./tests/tcp-client.sh > /dev/null 2>&1 &
+	trap "kill $$!" SIGTERM SIGINT;
+	./tests/tcp-reply.sh > /dev/null 2>&1 &
+	trap "kill $$!" SIGTERM SIGINT;
+	cc $(@) deps/ok/libok.a $(TARGET_STATIC) $(CFLAGS) -o $(@:.c=);
+	./$(@:.c=);
 
 deps:
 	make -C deps/ok

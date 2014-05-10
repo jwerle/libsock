@@ -5,8 +5,10 @@
  * copyright (c) 2014 joseph werle <joseph.werle@gmail.com>
  */
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <netdb.h>
+#include <string.h>
 #include "sock/socket.h"
 #include "sock/tcp.h"
 #include "sock/dgram.h"
@@ -30,15 +32,9 @@ sock_set_opt (socket_t *sock, int opt, const void *value) {
         default: return -1;
       }
       break;
-
     case SOCK_OPT_PORT:
-      switch (sock->type) {
-        case SOCK_TYPE_TCP:
-          port = *((int *)value);
-          tcp->addr->sin_port = htons(port);
-          break;
-        default: return -1;
-      }
+      port = *((int *)value);
+      tcp->addr->sin_port = htons(port);
       break;
 
     case SOCK_OPT_ADDR:
@@ -46,8 +42,13 @@ sock_set_opt (socket_t *sock, int opt, const void *value) {
       break;
 
     case SOCK_OPT_HOST:
-      host = gethostbyname(value);
-      tcp->addr->sin_addr = *(struct in_addr *) host->h_addr;
+      host = gethostbyname((char *)value);
+      if (NULL == host) { return -1; }
+      bcopy(
+          (char *) host->h_addr,
+          (char *) &tcp->addr->sin_addr,
+           host->h_length);
+      sock->host = host;
       break;
 
     default: return setsockopt(sock->fd,

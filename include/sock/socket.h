@@ -19,6 +19,7 @@
   int sfd;                   \
   socklen_t len;             \
   struct sockaddr_in *addr;  \
+  struct hostent *host;      \
 
 typedef struct socket_s {
   SOCK_SOCKET_FIELDS
@@ -63,19 +64,43 @@ SOCK_EXTERN int
 sock_accept (socket_t *);
 
 /**
- * Reads message of `size_t size` from `socket_t *' into a
- * buffer
+ * Recieves message of from `socket_t *' and returns
+ * a `char *' pointer
  */
 
 SOCK_EXTERN char *
-sock_read (socket_t *);
+sock_recv (socket_t *);
+
+/**
+ * Reads a message from `socket_t *' into
+ * `char *' buffer of `size_t' size. `bero()'
+ * is applied to buffer and return code
+ * from `read()' is returned
+ */
+
+SOCK_EXTERN int
+sock_read (socket_t *, char *, size_t);
 
 /**
  * Binds socket
  */
 
 SOCK_EXTERN int
-sock_bind(socket_t *);
+sock_bind (socket_t *);
+
+/**
+ * Connects to a socket
+ */
+
+SOCK_EXTERN int
+sock_connect (socket_t *);
+
+/**
+ * Writes to a socket
+ */
+
+SOCK_EXTERN int
+sock_write (socket_t *, char *);
 
 /**
  * Closes a socket
