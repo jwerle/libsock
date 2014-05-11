@@ -26,6 +26,7 @@ typedef void (on_request_t) (struct server_s *, socket_t *, char *);
 typedef struct server_s {
   socket_t *socket;
   on_request_t *cb;
+  int port;
   int active;
 } server_t;
 
@@ -56,6 +57,7 @@ server_new (int port, on_request_t *cb) {
   if (rc < 0) { return NULL; }
 
   self->active = 1;
+  self->port = port;
   self->socket = sock;
   self->cb = cb;
   return self;
@@ -95,9 +97,11 @@ server_shutdown (server_t *self) {
 
 void
 on_req (server_t *self, socket_t *sock, char *buf) {
-
-#define reply(str) ({                             \
-  int rc = sock_write(sock, str);                 \
+  char msg[1024];
+  msg[0] = '\0';
+#define write(str) strcat(msg, str)
+#define reply() ({                                \
+  int rc = sock_write(sock, msg);                 \
   if (rc < 0) { server_shutdown(self); return; }  \
 })
 
@@ -109,12 +113,14 @@ on_req (server_t *self, socket_t *sock, char *buf) {
   printf("< %s\n", buf);
   printf("> %s\n", message);
 
-  reply("reply: ");
-  reply(message);
-  reply("\n");
+  write("reply: ");
+  write(message);
+  write("\n");
+  reply();
 
   sock_close(sock);
 
+#undef write
 #undef reply
 }
 
@@ -156,9 +162,7 @@ main (int argc, char **argv) {
   }
 
   rc = server_listen(server);
-  if (rc < 0) { return server_free(server), 1; }
-
   server_free(server);
-
+  if (rc < 0) { return 1; }
   return 0;
 }

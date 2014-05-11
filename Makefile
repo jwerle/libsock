@@ -81,6 +81,7 @@ deps:
 
 clean:
 	make clean -C deps/ok
+	make clean -C examples
 	rm -f $(OBJS)
 	rm -f $(BIN)
 	rm -f $(TARGET_STATIC)
@@ -91,7 +92,10 @@ clean:
 
 docs: $(MAN_FILES)
 
+examples: $(TARGET_DSO)
+	make -C examples
+
 $(MAN_FILES):
 	curl -# -F page=@$(@) -o $(@:%.md=%) http://mantastic.herokuapp.com
 
-.PHONY: deps $(MAN_FILES) $(TESTS)
+.PHONY: deps $(MAN_FILES) $(TESTS) examples
