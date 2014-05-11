@@ -1,12 +1,12 @@
 
-CFLAGS += -std=c99 -Wall -L../ -lsock -I../include
+CFLAGS += -std=c99 -Wall -I../include
 
 TCP ?= $(wildcard tcp/*.c)
 
 tcp: $(TCP)
 
 $(TCP):
-	$(CC) $(@) $(CFLAGS) -o $(@:.c=)
+	$(CC) $(@) ../libsock.a $(CFLAGS) -o $(@:.c=)
 
 clean:
 	rm -f $(TCP:.c=)
