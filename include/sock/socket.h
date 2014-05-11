@@ -14,8 +14,8 @@
 #define SOCK_BUFSIZE 4096
 
 #define SOCK_SOCKET_FIELDS   \
-  int type;                  \
-  int fd;                    \
+  int type:2;                \
+  int fd:16;                 \
   int sfd;                   \
   socklen_t len;             \
   struct sockaddr_in *addr;  \
