@@ -26,7 +26,7 @@ TARGET_DSO = $(TARGET_NAME).so
 
 CFLAGS += -std=c99 -Wall -O2 -fvisibility=hidden -fPIC -pedantic
 CFLAGS += -DSOCK_VERSION='"$(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH)"'
-CFLAGS += -Ideps -Iinclude
+CFLAGS += -Ideps -Iinclude -DSOCK_LIB
 
 LDFLAGS += -o $(TARGET_DSOLIB) -shared -soname $(TARGET_DSO).$(VERSION_MAJOR)
 
