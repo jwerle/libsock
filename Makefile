@@ -17,7 +17,7 @@ LIB_NAME ?= sock
 
 VERSION_MAJOR = 0
 VERSION_MINOR = 0
-VERSION_PATCH = 5
+VERSION_PATCH = 6
 
 TARGET_NAME = lib$(LIB_NAME)
 TARGET_STATIC = $(TARGET_NAME).a
@@ -41,7 +41,7 @@ install: $(BIN)
 	mkdir -p $(PREFIX)/include/$(LIB_NAME)
 	install include/sock.h $(PREFIX)/include
 	cp include/sock/*.h $(PREFIX)/include/sock
-	install $(TARGET_DSO) $(PREFIX)/lib
+	cp *.so* $(PREFIX)/lib
 
 $(TARGET_STATIC): $(OBJS)
 	ar crus $(TARGET_STATIC) $(OBJS)
