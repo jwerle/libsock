@@ -1,12 +1,13 @@
 {
   "name": "sock",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "repo": "jwerle/libsock",
   "description": "Higher level API for working with sockets in C",
   "keywords": ["tcp", "udp", "sockets"],
   "license": "MIT",
   "src": [
-    "include/sock.h",
+    "sock.h",
+
     "include/sock/common.h",
     "include/sock/opt.h",
     "include/sock/socket.h",

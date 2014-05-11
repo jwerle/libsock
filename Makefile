@@ -17,7 +17,7 @@ LIB_NAME ?= sock
 
 VERSION_MAJOR = 0
 VERSION_MINOR = 0
-VERSION_PATCH = 1
+VERSION_PATCH = 3
 
 TARGET_NAME = lib$(LIB_NAME)
 TARGET_STATIC = $(TARGET_NAME).a
@@ -26,7 +26,7 @@ TARGET_DSO = $(TARGET_NAME).so
 
 CFLAGS += -std=c99 -Wall -O2 -fvisibility=hidden -fPIC -pedantic
 CFLAGS += -DSOCK_VERSION='"$(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH)"'
-CFLAGS += -Ideps -Iinclude -DSOCK_LIB
+CFLAGS += -Ideps -Iinclude -Iinclude/sock -DSOCK_LIB
 
 LDFLAGS += -o $(TARGET_DSOLIB) -shared -soname $(TARGET_DSO).$(VERSION_MAJOR)
 
@@ -39,12 +39,9 @@ $(BIN): $(TARGET_STATIC) $(TARGET_DSO)
 
 install: $(BIN)
 	mkdir -p $(PREFIX)/include/$(LIB_NAME)
-	cp include/sock/*.h $(PREFIX)/include/sock
 	install include/sock.h $(PREFIX)/include
+	cp include/sock/*.h $(PREFIX)/include/sock
 	install $(TARGET_DSO) $(PREFIX)/lib
-	@#install $(BIN) $(PREFIX)/bin
-	install man/*.1 $(MANPREFIX)/man1
-	@#install man/*.3 $(MANPREFIX)/man3
 
 $(TARGET_STATIC): $(OBJS)
 	ar crus $(TARGET_STATIC) $(OBJS)
