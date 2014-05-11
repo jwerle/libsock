@@ -9,16 +9,15 @@
 #include <sock/opt.h>
 #include <sock/tcp.h>
 
-#define BUF_SIZE 1024
+#define BUF_SIZE 128
 
 int
 main (void) {
 
   int rc = 0;
 
-  // server
   {
-    int bl = 20; // backlog
+    int bl = 20;
 
     {
       socket_t *sock = sock_tcp_new();
@@ -44,6 +43,8 @@ main (void) {
 
       rc = sock_tcp_listen(sock);
       assert(rc >= 0);
+
+      sock_shutdown(sock);
 
       sock_free(sock);
 
@@ -76,30 +77,30 @@ main (void) {
 
       while ((rc = sock_accept(sock))) {
         buf = sock_recv(sock);
-        if (NULL == buf) {
-          rc = sock_close(sock);
-          free(buf);
-          return 1;
-        }
+
+        if (NULL == buf) { return 1; }
+
         free(buf);
-        rc = sock_close(sock);
-        if (rc < 0) {
-          sock_free(sock);
-          return 1;
-        }
-        usleep(5000);
+
         printf("%c[3K\r  ...reads: (+%d/%d)", 27, ++reads, limit);
         fflush(stdout);
+
+        if (sock_close(sock) < 0) { return sock_free(sock), 1; }
         if (reads == limit) { break; }
+
+        usleep(5000);
       }
 
       printf("\n");
+      rc = sock_shutdown(sock);
+      close(sock->fd);
+      assert(rc >= 0);
+
       sock_free(sock);
       ok("sock_tcp_listen(socket_t *) [127.0.0.1]");
     }
   }
 
-  // client
   {
     char *buf = (char *) malloc(sizeof(char) * BUF_SIZE);
     socket_t *client = sock_tcp_client_new("127.0.0.1", 6003);
@@ -118,8 +119,10 @@ main (void) {
 
     assert(0 == strcmp("reply", buf));
 
-    free(buf);
+    rc = sock_shutdown(client);
+    assert(rc >= 0);
 
+    free(buf);
     sock_free(client);
 
     ok("sock_tcp_client_new(socket_t *)");

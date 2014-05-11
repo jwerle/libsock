@@ -15,7 +15,6 @@
 # define SOCK_EXTERN
 #endif
 
-// alias
 #ifdef _WIN64
 
 #elif _WIN32
@@ -37,7 +36,9 @@
 #error "Unsupported platform"
 #endif
 
-// socket types type
+#define recast(type, value) ((type *) value)
+#define h_addr h_addr_list[0] /* for backward compatibility */
+
 #define X(t) SOCK_TYPE_ ## t
 enum {
   X(TCP),

@@ -1,3 +1,4 @@
 #!/bin/bash
 
-echo -n reply | nc -l 6003
+sleep 1
+echo -n reply | timeout 1 nc -w 1 -l 6003

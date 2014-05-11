@@ -71,11 +71,9 @@ $(TESTS):
 	@./$(@:.c=)
 
 tests/tcp.c:
-	./tests/tcp-client.sh > /dev/null 2>&1 &
-	trap "kill $$!" SIGTERM SIGINT;
-	./tests/tcp-reply.sh > /dev/null 2>&1 &
-	trap "kill $$!" SIGTERM SIGINT;
 	cc $(@) deps/ok/libok.a $(TARGET_STATIC) $(CFLAGS) -o $(@:.c=);
+	./tests/tcp-client.sh > /dev/null 2>&1 &
+	./tests/tcp-reply.sh > /dev/null 2>&1 &
 	./$(@:.c=);
 
 deps:

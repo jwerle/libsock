@@ -13,10 +13,10 @@
 
 #define X(o) SOCK_OPT_ ## o
 enum {
-  X(BACKLOG),
+  X(BACKLOG) = 0xff,
   X(PORT),
   X(ADDR),
-  X(HOST),
+  X(HOST)
 };
 #undef X
 

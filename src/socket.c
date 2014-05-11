@@ -1,4 +1,3 @@
-
 /**
  * `socket.c' - libsock
  *
@@ -19,11 +18,9 @@ sock_new (int domain, int type) {
   socket_t *self = NULL;
   int fd = 0;
 
-  // socket
   fd = sock_raw_new(domain, type, 0);
   if (fd < 0) { return perror("sock_new"), NULL; }
 
-  // alloc
   self = (socket_t *) malloc(sizeof(socket_t));
   sock_init(self, fd);
 
@@ -39,20 +36,17 @@ sock_raw_new (int domain, int type, int protocol) {
 socket_t *
 sock_init (socket_t *self, int fd) {
   struct sockaddr_in *addr = NULL;
-
-  // alloc
   addr = (struct sockaddr_in *) malloc(sizeof(struct sockaddr_in));
 
-  if (NULL == self) { return NULL; }
   if (NULL == addr) { return NULL; }
 
-  // empty
-  bzero((char *) addr, sizeof(struct sockaddr_in));
+  memset(addr, 0, sizeof(struct sockaddr_in));
 
-  // assign
+  self->type = 0;
   self->host = NULL;
   self->addr = addr;
   self->fd = fd;
+
   return self;
 }
 
@@ -68,7 +62,7 @@ sock_accept (socket_t *self) {
 char *
 sock_recv (socket_t *self) {
   ssize_t size = 0;
-  char *buf = (char *) malloc(sizeof(buf));
+  char *buf = (char *) malloc(sizeof(buf) * SOCK_BUFSIZE);
   if (NULL == buf) { return NULL; }
 read:
   size = recv(self->sfd, buf, SOCK_BUFSIZE, 0);
@@ -80,8 +74,9 @@ read:
 
 int
 sock_read (socket_t *self, char *buf, size_t size) {
-  bzero(buf, size);
-  int rc = read(self->fd, buf, size - 1);
+  int rc =0;
+  memset(buf, 0, size);
+  rc = read(self->fd, buf, size - 1);
   if (rc < 0) { return perror("sock_read"), -1; }
   return rc;
 }
@@ -110,9 +105,24 @@ sock_write (socket_t *self, char *buf) {
 
 int
 sock_close (socket_t *self) {
-  int rc = shutdown(self->fd, SHUT_RDWR);
-  if (rc < 0) { rc = shutdown(self->sfd, SHUT_RDWR); }
+  int rc = 0;
+  int fd = self->sfd;
+  if (0 == fd) { return -1; }
+  rc = shutdown(fd, SHUT_RDWR);
   if (rc < 0) { return perror("sock_close"), rc; }
+  rc = close(fd);
+  if (rc < 0) { return perror("sock_close"), rc; }
+  self->sfd = 0;
+  return rc;
+}
+
+int
+sock_shutdown (socket_t *self) {
+  int rc = 0;
+  if (self->sfd > 0) { rc = sock_close(self); }
+  if (rc < 0) { return rc; }
+  rc = shutdown(self->fd, SHUT_RDWR);
+  if (rc < 0) { return perror("sock_shutdown"), rc; }
   return rc;
 }
 

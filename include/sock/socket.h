@@ -103,11 +103,21 @@ SOCK_EXTERN int
 sock_write (socket_t *, char *);
 
 /**
- * Closes a socket
+ * Closes an open socket
+ * descriptor
  */
 
 SOCK_EXTERN int
 sock_close (socket_t *);
+
+/**
+ * Shuts down a socket and
+ * closes the open file descriptor
+ * if none zero
+ */
+
+SOCK_EXTERN int
+sock_shutdown (socket_t *);
 
 /**
  * Free a socket from memory
