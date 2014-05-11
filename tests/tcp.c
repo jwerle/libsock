@@ -44,8 +44,6 @@ main (void) {
       rc = sock_tcp_listen(sock);
       assert(rc >= 0);
 
-      sock_shutdown(sock);
-
       sock_free(sock);
 
       ok("sock_tcp_listen(socket_t *) [INADDR_ANY]");
@@ -92,7 +90,7 @@ main (void) {
       }
 
       printf("\n");
-      rc = sock_shutdown(sock);
+      //rc = sock_shutdown(sock);
       close(sock->fd);
       assert(rc >= 0);
 
@@ -119,8 +117,7 @@ main (void) {
 
     assert(0 == strcmp("reply", buf));
 
-    rc = sock_shutdown(client);
-    assert(rc >= 0);
+    sock_close(client);
 
     free(buf);
     sock_free(client);
