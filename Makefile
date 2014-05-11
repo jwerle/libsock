@@ -55,7 +55,7 @@ ifeq ("Darwin","$(OS)")
 	ln -s $(TARGET_DSOLIB) $(TARGET_DSO)
 	ln -s $(TARGET_DSOLIB) $(TARGET_DSO).$(VERSION_MAJOR)
 else
-	$(CC) -shared $(OBJS) -o $(TARGET_DSOLIB)
+	$(CC) $(LDFLAGS) $(OBJS) -o $(TARGET_DSOLIB)
 	ln -s $(TARGET_DSOLIB) $(TARGET_DSO)
 	ln -s $(TARGET_DSOLIB) $(TARGET_DSO).$(VERSION_MAJOR)
 	strip --strip-unneeded $(TARGET_DSO)
@@ -67,7 +67,7 @@ $(OBJS):
 test: $(OBJS) $(TARGET_STATIC) deps $(TESTS)
 
 $(TESTS):
-	@cc $(@) deps/ok/libok.a $(TARGET_STATIC) $(CFLAGS) -o $(@:.c=)
+	@cc $(@) deps/ok/libok.a -L. -lsock $(CFLAGS) -o $(@:.c=)
 	@./$(@:.c=)
 
 tests/tcp.c:
