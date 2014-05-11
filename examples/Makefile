@@ -8,4 +8,7 @@ tcp: $(TCP)
 $(TCP):
 	$(CC) $(@) $(CFLAGS) -o $(@:.c=)
 
+clean:
+	rm -f $(TCP:.c=)
+
 .PHONY: tcp $(TCP)
