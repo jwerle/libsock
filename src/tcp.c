@@ -15,9 +15,7 @@
 #include <netinet/tcp.h>
 #include <netinet/ip.h>
 #include <netdb.h>
-#include "sock/opt.h"
-#include "sock/socket.h"
-#include "sock/tcp.h"
+#include "sock.h"
 
 socket_t *
 sock_tcp_new () {

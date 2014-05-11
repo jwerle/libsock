@@ -9,10 +9,7 @@
 #include <stdlib.h>
 #include <netdb.h>
 #include <string.h>
-#include "sock/socket.h"
-#include "sock/tcp.h"
-#include "sock/dgram.h"
-#include "sock/opt.h"
+#include "sock.h"
 
 int
 sock_set_opt (socket_t *sock, int opt, const void *value) {

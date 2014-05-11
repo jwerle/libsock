@@ -10,8 +10,7 @@
 #include <unistd.h>
 #include <sys/socket.h>
 #include <netinet/ip.h>
-#include "sock/socket.h"
-#include "sock/tcp.h"
+#include "sock.h"
 
 socket_t *
 sock_new (int domain, int type) {
