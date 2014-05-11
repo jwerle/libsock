@@ -26,9 +26,7 @@ TARGET_DSO = $(TARGET_NAME).so
 
 CFLAGS += -std=c99 -Wall -O2 -fvisibility=hidden -fPIC -pedantic
 CFLAGS += -DSOCK_VERSION='"$(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH)"'
-CFLAGS += -Ideps -Iinclude -Iinclude/sock -DSOCK_LIB
-
-LDFLAGS += -o $(TARGET_DSOLIB) -shared -soname $(TARGET_DSO).$(VERSION_MAJOR)
+CFLAGS += -Ideps -Iinclude -Iinclude/sock
 
 ifeq ($(OS), Darwin)
 	LDFLAGS += -lc -Wl,-install_name,$(TARGET_DSO)
@@ -48,11 +46,11 @@ $(TARGET_STATIC): $(OBJS)
 
 $(TARGET_DSO): $(OBJS)
 ifeq ("Darwin","$(OS)")
-	$(CC) -shared $(OBJS) $(OSX_LDFLAGS) -o $(TARGET_DSOLIB)
+	$(CC) -shared $(OBJS) $(OSX_LDFLAGS)
 	ln -s $(TARGET_DSOLIB) $(TARGET_DSO)
 	ln -s $(TARGET_DSOLIB) $(TARGET_DSO).$(VERSION_MAJOR)
 else
-	$(CC) $(LDFLAGS) $(OBJS) -o $(TARGET_DSOLIB)
+	$(CC) -shared $(OBJS) -o $(TARGET_DSOLIB)
 	ln -s $(TARGET_DSOLIB) $(TARGET_DSO)
 	ln -s $(TARGET_DSOLIB) $(TARGET_DSO).$(VERSION_MAJOR)
 	strip --strip-unneeded $(TARGET_DSO)
