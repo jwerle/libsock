@@ -90,8 +90,7 @@ main (void) {
       }
 
       printf("\n");
-      //rc = sock_shutdown(sock);
-      close(sock->fd);
+      sock_close(sock);
       assert(rc >= 0);
 
       sock_free(sock);

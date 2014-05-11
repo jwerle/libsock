@@ -10,6 +10,7 @@
 
 #include "sock/socket.h"
 #include "sock/tcp.h"
+#include "sock/opt.h"
 #include "sock/dgram.h"
 
 #endif

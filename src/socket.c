@@ -99,7 +99,10 @@ sock_connect (socket_t *self) {
 
 int
 sock_write (socket_t *self, char *buf) {
-  int rc = write(self->fd, buf, strlen(buf) + 1);
+  int fd = 0;
+  int rc = 0;
+  fd = self->sfd > 0 ? self->sfd : self->fd;
+  write(fd, buf, strlen(buf) + 1);
   return rc;
 }
 
