@@ -1,6 +1,6 @@
 {
   "name": "sock",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "repo": "jwerle/libsock",
   "description": "Higher level API for working with sockets in C",
   "keywords": ["tcp", "udp", "sockets"],
