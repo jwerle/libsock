@@ -35,22 +35,28 @@ sock_set_opt (socket_t *sock, int opt, const void *value) {
       break;
     case SOCK_OPT_PORT:
       port = *recast(int, value);
-      tcp->addr->sin_port = htons(port);
+      sock->addr->sin_port = htons(port);
+      sock->port = port;
       break;
 
     case SOCK_OPT_ADDR:
       hl = *recast(uint32_t, value);
-      tcp->addr->sin_addr.s_addr = (uint32_t) htonl(hl);
+      sock->addr->sin_addr.s_addr = (uint32_t) htonl(hl);
       break;
 
     case SOCK_OPT_HOST:
-      host = gethostbyname((char *)value);
+      sock->host_s = (char *) value;
+      host = gethostbyname((char *) value);
       if (NULL == host) { return -1; }
       memmove(
           &tcp->addr->sin_addr,
           (char *) host->h_addr,
            host->h_length);
       sock->host = host;
+      break;
+
+    case SOCK_OPT_SERVICE:
+      sock->service = (char *) value;
       break;
 
     default:

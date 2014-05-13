@@ -16,7 +16,8 @@ enum {
   X(BACKLOG) = 0xff,
   X(PORT),
   X(ADDR),
-  X(HOST)
+  X(HOST),
+  X(SERVICE),
 };
 #undef X
 

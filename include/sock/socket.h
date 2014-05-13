@@ -11,15 +11,20 @@
 #include <sys/socket.h>
 #include "common.h"
 
-#define SOCK_BUFSIZE 4096
+#define SOCK_BUFSIZE 0x1000
 
 #define SOCK_SOCKET_FIELDS   \
   int type:2;                \
   int fd:16;                 \
   int sfd;                   \
+  int domain;                \
+  int sock_type;             \
+  int port;                  \
   socklen_t len;             \
   struct sockaddr_in *addr;  \
   struct hostent *host;      \
+  char *host_s;              \
+  char *service;             \
 
 typedef struct socket_s {
   SOCK_SOCKET_FIELDS
@@ -48,55 +53,65 @@ SOCK_EXTERN int
 sock_raw_new (int, int, int);
 
 /**
- * Allocates a new `socket_t *' from
- * a given file descriptor created with
- * `socket(int, int, int)'
+ * Initializes a `socket_t *.
  */
 
 SOCK_EXTERN socket_t *
 sock_init (socket_t *, int);
 
 /**
- * Accepts a connection on `socket_t *'
+ * Accepts a connection on a socket.
  */
 
 SOCK_EXTERN int
 sock_accept (socket_t *);
 
 /**
- * Recieves message of from `socket_t *' and returns
- * a `char *' pointer
+ * Receives message from a connected socket
+ * and returns a `char *' pointer.
  */
 
 SOCK_EXTERN char *
 sock_recv (socket_t *);
 
 /**
- * Reads a message from `socket_t *' into
- * `char *' buffer of `size_t' size. `bero()'
- * is applied to buffer and return code
- * from `read()' is returned
+ * Receives a message from a socket.
+ */
+
+SOCK_EXTERN char *
+sock_recvfrom (socket_t *);
+
+/**
+ * Reads a message from socket into
+ * `char *' buffer of `size_t' size.
  */
 
 SOCK_EXTERN int
 sock_read (socket_t *, char *, size_t);
 
 /**
- * Binds socket
+ * Binds a socket.
  */
 
 SOCK_EXTERN int
 sock_bind (socket_t *);
 
 /**
- * Connects to a socket
+ * Connects to a socket.
  */
 
 SOCK_EXTERN int
 sock_connect (socket_t *);
 
 /**
- * Writes to a socket
+ * Sends a message to a socket.
+ */
+
+SOCK_EXTERN int
+sock_send (socket_t *, char *);
+
+/**
+ * Writes to a socket.
  */
 
 SOCK_EXTERN int
@@ -104,7 +119,7 @@ sock_write (socket_t *, char *);
 
 /**
  * Closes an open socket
- * descriptor
+ * descriptor.
  */
 
 SOCK_EXTERN int
@@ -113,14 +128,14 @@ sock_close (socket_t *);
 /**
  * Shuts down a socket and
  * closes the open file descriptor
- * if none zero
+ * if none zero.
  */
 
 SOCK_EXTERN int
 sock_shutdown (socket_t *);
 
 /**
- * Free a socket from memory
+ * Free a socket from memory.
  */
 
 SOCK_EXTERN void

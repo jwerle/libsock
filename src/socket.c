@@ -10,6 +10,7 @@
 #include <unistd.h>
 #include <sys/socket.h>
 #include <netinet/ip.h>
+#include <netdb.h>
 #include "sock.h"
 
 socket_t *
@@ -21,6 +22,8 @@ sock_new (int domain, int type) {
   if (fd < 0) { return perror("sock_new"), NULL; }
 
   self = (socket_t *) malloc(sizeof(socket_t));
+  self->domain = domain;
+  self->sock_type = type;
   sock_init(self, fd);
 
   if (NULL == self) { return NULL; }
@@ -71,6 +74,25 @@ read:
   return buf;
 }
 
+char *
+sock_recvfrom (socket_t *self) {
+  ssize_t size = 0;
+  char *buf = (char *) malloc(sizeof(buf) * SOCK_BUFSIZE);
+  if (NULL == buf) { return NULL; }
+read:
+  size = recvfrom(
+      self->fd,
+      buf,
+      SOCK_BUFSIZE,
+      0,
+      (struct sockaddr *) self->addr,
+      (socklen_t *) sizeof(self->addr));
+  buf[size] = '\0';
+  if (size < 0) { return perror("sock_recvfrom()"), free(buf), NULL; }
+  else if (0 == size) goto read;
+  return buf;
+}
+
 int
 sock_read (socket_t *self, char *buf, size_t size) {
   int rc =0;
@@ -93,6 +115,13 @@ sock_connect (socket_t *self) {
   int rc = connect(self->fd,
       (struct sockaddr *) self->addr, sizeof(struct sockaddr_in));
   if (rc < 0) { return perror("sock_connect"), rc; }
+  return rc;
+}
+
+int
+sock_send (socket_t *self, char *buf) {
+  int rc = 0;
+  rc = send(self->fd, buf, strlen(buf), 0);
   return rc;
 }
 
