@@ -62,15 +62,16 @@ sock_accept (socket_t *self) {
 }
 
 char *
-sock_recv (socket_t *self) {
+sock_recv (socket_t *self, int cont) {
   ssize_t size = 0;
   char *buf = (char *) malloc(sizeof(buf) * SOCK_BUFSIZE);
+  int fd = self->sfd > 0 ? self->sfd : self->fd;
   if (NULL == buf) { return NULL; }
 read:
-  size = recv(self->sfd, buf, SOCK_BUFSIZE, 0);
+  size = recv(fd, buf, SOCK_BUFSIZE, 0);
   buf[size] = '\0';
   if (size < 0) return perror("sock_recv()"), free(buf), NULL;
-  else if (0 == size) goto read;
+  else if (0 == size && 0 != cont) goto read;
   return buf;
 }
 
@@ -96,10 +97,11 @@ read:
 int
 sock_read (socket_t *self, char *buf, size_t size) {
   int rc = 0;
+  int len = 0;
   memset(buf, 0, size);
-  rc = read(self->fd, buf, size - 1);
-  if (rc < 0) { return perror("sock_read"), -1; }
-  return rc;
+  len = read(self->fd, buf, size);
+  if (len < 0) { return perror("sock_read"), -1; }
+  return len;
 }
 
 int

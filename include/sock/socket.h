@@ -11,7 +11,7 @@
 #include <sys/socket.h>
 #include "common.h"
 
-#define SOCK_BUFSIZE 0x1000
+#define SOCK_BUFSIZE 0x14000
 
 #define SOCK_SOCKET_FIELDS   \
   int type:2;                \
@@ -68,11 +68,13 @@ sock_accept (socket_t *);
 
 /**
  * Receives message from a connected socket
- * and returns a `char *' pointer.
+ * and returns a `char *' pointer. If the
+ * second argument is `0' then it returns
+ * a buffer after a single call to `recv'
  */
 
 SOCK_EXTERN char *
-sock_recv (socket_t *);
+sock_recv (socket_t *, int);
 
 /**
  * Receives a message from a socket.

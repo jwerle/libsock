@@ -74,7 +74,7 @@ main (void) {
       assert(rc >= 0);
 
       while ((rc = sock_accept(sock))) {
-        buf = sock_recv(sock);
+        buf = sock_recv(sock, 1);
 
         if (NULL == buf) { return 1; }
 
