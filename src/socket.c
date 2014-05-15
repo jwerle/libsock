@@ -95,7 +95,7 @@ read:
 
 int
 sock_read (socket_t *self, char *buf, size_t size) {
-  int rc =0;
+  int rc = 0;
   memset(buf, 0, size);
   rc = read(self->fd, buf, size - 1);
   if (rc < 0) { return perror("sock_read"), -1; }
