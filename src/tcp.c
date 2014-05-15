@@ -54,7 +54,7 @@ int
 sock_tcp_listen (socket_t *sock) {
   socket_tcp_t *self = (socket_tcp_t *) sock;
   int rc = listen(sock->fd, self->backlog);
-  if (rc < 0) { return perror("sock_tcp_listen"), rc; }
+  if (rc < 0) { return sock_perror("sock_tcp_listen"), rc; }
   return rc;
 }
 

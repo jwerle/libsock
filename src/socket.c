@@ -19,7 +19,7 @@ sock_new (int domain, int type) {
   int fd = 0;
 
   fd = sock_raw_new(domain, type, 0);
-  if (fd < 0) { return perror("sock_new"), NULL; }
+  if (fd < 0) { return sock_perror("sock_new"), NULL; }
 
   self = (socket_t *) malloc(sizeof(socket_t));
   self->domain = domain;
@@ -56,7 +56,7 @@ int
 sock_accept (socket_t *self) {
   socklen_t len = sizeof(struct sockaddr_in);
   int sfd = accept(self->fd, (struct sockaddr *) self->addr, &len);
-  if (sfd < 0) { return perror("sock_accept"), sfd; }
+  if (sfd < 0) { return sock_perror("sock_accept"), sfd; }
   self->sfd = sfd;
   return sfd;
 }
@@ -70,7 +70,7 @@ sock_recv (socket_t *self, int cont) {
 read:
   size = recv(fd, buf, SOCK_BUFSIZE, 0);
   buf[size] = '\0';
-  if (size < 0) return perror("sock_recv()"), free(buf), NULL;
+  if (size < 0) return sock_perror("sock_recv()"), free(buf), NULL;
   else if (0 == size && 0 != cont) goto read;
   return buf;
 }
@@ -89,7 +89,7 @@ read:
       (struct sockaddr *) self->addr,
       (socklen_t *) sizeof(self->addr));
   buf[size] = '\0';
-  if (size < 0) { return perror("sock_recvfrom()"), free(buf), NULL; }
+  if (size < 0) { return sock_perror("sock_recvfrom()"), free(buf), NULL; }
   else if (0 == size) goto read;
   return buf;
 }
@@ -100,7 +100,7 @@ sock_read (socket_t *self, char *buf, size_t size) {
   int len = 0;
   memset(buf, 0, size);
   len = read(self->fd, buf, size);
-  if (len < 0) { return perror("sock_read"), -1; }
+  if (len < 0) { return sock_perror("sock_read"), -1; }
   return len;
 }
 
@@ -108,7 +108,7 @@ int
 sock_bind (socket_t *self) {
   size_t len = sizeof(struct sockaddr_in);
   int rc = bind(self->fd, (struct sockaddr *) self->addr, len);
-  if (rc < 0) { return perror("sock_bind"), rc; }
+  if (rc < 0) { return sock_perror("sock_bind"), rc; }
   return rc;
 }
 
@@ -116,7 +116,7 @@ int
 sock_connect (socket_t *self) {
   int rc = connect(self->fd,
       (struct sockaddr *) self->addr, sizeof(struct sockaddr_in));
-  if (rc < 0) { return perror("sock_connect"), rc; }
+  if (rc < 0) { return sock_perror("sock_connect"), rc; }
   return rc;
 }
 
@@ -142,9 +142,9 @@ sock_close (socket_t *self) {
   int fd = self->sfd;
   if (0 == fd) { return -1; }
   rc = shutdown(fd, SHUT_RDWR);
-  if (rc < 0) { return perror("sock_close"), rc; }
+  if (rc < 0) { return sock_perror("sock_close"), rc; }
   rc = close(fd);
-  if (rc < 0) { return perror("sock_close"), rc; }
+  if (rc < 0) { return sock_perror("sock_close"), rc; }
   self->sfd = 0;
   return rc;
 }
@@ -155,7 +155,7 @@ sock_shutdown (socket_t *self) {
   if (self->sfd > 0) { rc = sock_close(self); }
   if (rc < 0) { return rc; }
   rc = shutdown(self->fd, SHUT_RDWR);
-  if (rc < 0) { return perror("sock_shutdown"), rc; }
+  if (rc < 0) { return sock_perror("sock_shutdown"), rc; }
   return rc;
 }
 

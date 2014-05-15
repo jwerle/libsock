@@ -8,7 +8,6 @@
 #ifndef SOCK_COMMON_H
 #define SOCK_COMMON_H 1
 
-
 #if __GNUC__ >= 4
 # define SOCK_EXTERN __attribute__((visibility("default")))
 #else
@@ -33,11 +32,17 @@
 
 #elif __posix
 #else
-#error "Unsupported platform"
+# error "Unsupported platform"
 #endif
 
 #define recast(type, value) ((type *) value)
 #define h_addr h_addr_list[0] /* for backward compatibility */
+
+#ifdef SOCK_PERROR
+#define sock_perror perror
+#else
+#define sock_perror(pre) (0)
+#endif
 
 #define X(t) SOCK_TYPE_ ## t
 enum {

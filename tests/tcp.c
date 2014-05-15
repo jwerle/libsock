@@ -1,4 +1,7 @@
 
+// debug - print errors from `perror'
+#define SOCK_PERROR 1
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
